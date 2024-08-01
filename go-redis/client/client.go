@@ -51,10 +51,11 @@ func (c *Client) Init() {
 }
 func (c *Client) Execute(cmd string) (string, error) {
 	cmd_bytes := []byte(cmd)
-	_, err := c.conn.Write(cmd_bytes)
+	n1, err := c.conn.Write(cmd_bytes)
 	if err != nil {
 		return "", fmt.Errorf("error executing redis command %w", err)
 	}
+	fmt.Println("num bytes written is ", n1)
 	resp_buff := bytes.NewBuffer([]byte{})
 	_, err = io.Copy(resp_buff, c.conn)
 	if err != nil {

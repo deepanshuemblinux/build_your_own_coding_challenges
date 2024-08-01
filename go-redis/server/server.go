@@ -1,13 +1,12 @@
 package server
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net"
 	"os"
 
+	"github.com/deepanshuemblinux/go-redis/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -66,15 +65,16 @@ func (s *Server) acceptLoop(listener net.Listener) {
 }
 
 func (s *Server) handleConnection(conn net.Conn) {
-	req := bytes.NewBuffer([]byte{})
-	n, err := io.Copy(req, conn)
-	if err != nil {
-		fmt.Println(err)
-		return
+	req := make([][]byte, 0)
+	utils.ParseRequest(conn, &req)
+	for i, r := range req {
+		fmt.Printf("%dth index of request array is %s\n", i, string(r))
 	}
-	fmt.Println("num bytes read is ", n)
-	fmt.Println("request from client is ", string(req.Bytes()))
-	n1, err := conn.Write([]byte("+PONG\r\n"))
+	resp, err := utils.HandleCommand(&req)
+	if err != nil {
+		logrus.Error(err)
+	}
+	n1, err := conn.Write(resp)
 	if err != nil {
 		fmt.Println(err)
 		return

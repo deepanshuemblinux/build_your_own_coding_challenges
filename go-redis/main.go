@@ -36,6 +36,7 @@ func main() {
 			if strings.ToLower(cmd) == "exit" {
 				os.Exit(0)
 			}
+			fmt.Printf("Entered: %s\n", cmd)
 			resp, err := c.Execute(cmd)
 			if err != nil {
 				fmt.Println(err)
